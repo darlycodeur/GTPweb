@@ -27,6 +27,9 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/sessions',      require('./routes/sessionTravailRoutes'));
 app.use('/api/audit',         require('./routes/auditRoutes'));
 app.use('/api/upload',        require('./routes/uploadRoutes'));
+app.use('/api/dashboard',     require('./routes/dashboardRoutes'));
+app.use('/api/recherche',     require('./routes/rechercheRoutes'));
+app.use('/api/statistiques',  require('./routes/statistiqueRoutes'));
 
 // ─── ROUTE SANTÉ ──────────────────────────
 app.get('/api/health', (req, res) => {
@@ -37,9 +40,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ─── PAGE D'ACCUEIL → redirige vers login ──
+// ─── PAGE D'ACCUEIL ────────────────────────────
 app.get('/', (req, res) => {
-  res.redirect('/auth/login.html');
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // ─── ROUTE 404 ────────────────────────────

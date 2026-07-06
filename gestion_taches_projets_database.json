@@ -1,0 +1,712 @@
+{
+  "database": "gestion_taches_projets",
+  "collections": [
+    {
+      "collection": "users",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd40"
+          },
+          "nom": "Admin Principal",
+          "email": "admin@gestion.com",
+          "motDePasse": "$2a$10$hashedpassword_admin",
+          "role": "admin",
+          "avatar": "",
+          "actif": true,
+          "quotaTaches": 99,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "nom": "Jean Dupont",
+          "email": "jean.dupont@gestion.com",
+          "motDePasse": "$2a$10$hashedpassword_chef1",
+          "role": "chef_projet",
+          "avatar": "",
+          "actif": true,
+          "quotaTaches": 20,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd42"
+          },
+          "nom": "Marie Martin",
+          "email": "marie.martin@gestion.com",
+          "motDePasse": "$2a$10$hashedpassword_chef2",
+          "role": "chef_projet",
+          "avatar": "",
+          "actif": true,
+          "quotaTaches": 20,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd43"
+          },
+          "nom": "Alice Bernard",
+          "email": "alice.bernard@gestion.com",
+          "motDePasse": "$2a$10$hashedpassword_emp1",
+          "role": "employe",
+          "avatar": "",
+          "actif": true,
+          "quotaTaches": 10,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd44"
+          },
+          "nom": "Bob Leroy",
+          "email": "bob.leroy@gestion.com",
+          "motDePasse": "$2a$10$hashedpassword_emp2",
+          "role": "employe",
+          "avatar": "",
+          "actif": true,
+          "quotaTaches": 10,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd45"
+          },
+          "nom": "Clara Petit",
+          "email": "clara.petit@gestion.com",
+          "motDePasse": "$2a$10$hashedpassword_emp3",
+          "role": "employe",
+          "avatar": "",
+          "actif": true,
+          "quotaTaches": 10,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "categories",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd46"
+          },
+          "nom": "Informatique",
+          "couleur": "#3B82F6",
+          "icone": "laptop",
+          "description": "Projets et tâches liés au développement et à l'IT",
+          "portee": "les_deux",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd47"
+          },
+          "nom": "Ressources Humaines",
+          "couleur": "#10B981",
+          "icone": "users",
+          "description": "Projets liés aux RH et à la gestion du personnel",
+          "portee": "projet",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd48"
+          },
+          "nom": "Finance",
+          "couleur": "#F59E0B",
+          "icone": "dollar",
+          "description": "Tâches de suivi budgétaire et financier",
+          "portee": "tache",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "projets",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd49"
+          },
+          "titre": "Refonte du Système de Gestion Interne",
+          "description": "Migration complète vers une architecture moderne Node.js + MongoDB",
+          "statut": "en_cours",
+          "priorite": "haute",
+          "idCategorie": {
+            "$oid": "6a2a940f72a6b2418c0fbd46"
+          },
+          "dateDebut": {
+            "$date": "2024-01-15T00:00:00.000Z"
+          },
+          "dateFin": {
+            "$date": "2024-06-30T00:00:00.000Z"
+          },
+          "chefProjet": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "membres": [
+            {
+              "$oid": "6a2a940f72a6b2418c0fbd43"
+            },
+            {
+              "$oid": "6a2a940f72a6b2418c0fbd44"
+            }
+          ],
+          "budget": 50000,
+          "archive": false,
+          "dateArchivage": null,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd4a"
+          },
+          "titre": "Campagne de Recrutement Q2 2024",
+          "description": "Planification et suivi du recrutement de 15 nouveaux collaborateurs",
+          "statut": "planifie",
+          "priorite": "normale",
+          "idCategorie": {
+            "$oid": "6a2a940f72a6b2418c0fbd47"
+          },
+          "dateDebut": {
+            "$date": "2024-03-01T00:00:00.000Z"
+          },
+          "dateFin": {
+            "$date": "2024-05-31T00:00:00.000Z"
+          },
+          "chefProjet": {
+            "$oid": "6a2a940f72a6b2418c0fbd42"
+          },
+          "membres": [
+            {
+              "$oid": "6a2a940f72a6b2418c0fbd45"
+            }
+          ],
+          "budget": 15000,
+          "archive": false,
+          "dateArchivage": null,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "taches",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd4b"
+          },
+          "titre": "Analyse des besoins et rédaction du cahier des charges",
+          "description": "Réunions avec les parties prenantes et documentation complète",
+          "statut": "termine",
+          "priorite": "haute",
+          "projet": {
+            "$oid": "6a2a940f72a6b2418c0fbd49"
+          },
+          "assigneA": {
+            "$oid": "6a2a940f72a6b2418c0fbd43"
+          },
+          "categorie": {
+            "$oid": "6a2a940f72a6b2418c0fbd46"
+          },
+          "prerequis": [],
+          "dateEcheance": {
+            "$date": "2024-02-01T00:00:00.000Z"
+          },
+          "dateCompletion": {
+            "$date": "2024-01-30T00:00:00.000Z"
+          },
+          "estimation": 16,
+          "tempsReel": 18,
+          "scoreUrgence": 0,
+          "pieceJointes": [
+            {
+              "nom": "cahier_des_charges.pdf",
+              "url": "/uploads/cahier_des_charges.pdf",
+              "type": "application/pdf",
+              "taille": 204800,
+              "uploadePar": {
+                "$oid": "6a2a940f72a6b2418c0fbd43"
+              },
+              "uploadedAt": {
+                "$date": "2026-06-11T10:55:11.693Z"
+              }
+            }
+          ],
+          "tags": [
+            "analyse",
+            "documentation"
+          ],
+          "historique": [
+            {
+              "ancienStatut": "a_faire",
+              "nouveauStatut": "en_cours",
+              "changedBy": {
+                "$oid": "6a2a940f72a6b2418c0fbd43"
+              },
+              "note": "Démarrage de l'analyse",
+              "changedAt": {
+                "$date": "2024-01-16T08:00:00.000Z"
+              }
+            },
+            {
+              "ancienStatut": "en_cours",
+              "nouveauStatut": "termine",
+              "changedBy": {
+                "$oid": "6a2a940f72a6b2418c0fbd43"
+              },
+              "note": "Cahier des charges validé",
+              "changedAt": {
+                "$date": "2024-01-30T17:00:00.000Z"
+              }
+            }
+          ],
+          "createdBy": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd4c"
+          },
+          "titre": "Conception de la base de données MongoDB",
+          "description": "Modélisation des 8 collections avec leurs relations et index",
+          "statut": "en_cours",
+          "priorite": "haute",
+          "projet": {
+            "$oid": "6a2a940f72a6b2418c0fbd49"
+          },
+          "assigneA": {
+            "$oid": "6a2a940f72a6b2418c0fbd44"
+          },
+          "categorie": {
+            "$oid": "6a2a940f72a6b2418c0fbd46"
+          },
+          "prerequis": [
+            {
+              "$oid": "6a2a940f72a6b2418c0fbd4b"
+            }
+          ],
+          "dateEcheance": {
+            "$date": "2024-03-01T00:00:00.000Z"
+          },
+          "dateCompletion": null,
+          "estimation": 24,
+          "tempsReel": 10,
+          "scoreUrgence": 75,
+          "pieceJointes": [],
+          "tags": [
+            "mongodb",
+            "schema",
+            "conception"
+          ],
+          "historique": [
+            {
+              "ancienStatut": "a_faire",
+              "nouveauStatut": "en_cours",
+              "changedBy": {
+                "$oid": "6a2a940f72a6b2418c0fbd44"
+              },
+              "note": "Prérequis terminé, démarrage",
+              "changedAt": {
+                "$date": "2024-02-01T09:00:00.000Z"
+              }
+            }
+          ],
+          "createdBy": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd4d"
+          },
+          "titre": "Développement des APIs REST",
+          "description": "Implémentation de tous les endpoints Express",
+          "statut": "a_faire",
+          "priorite": "critique",
+          "projet": {
+            "$oid": "6a2a940f72a6b2418c0fbd49"
+          },
+          "assigneA": {
+            "$oid": "6a2a940f72a6b2418c0fbd43"
+          },
+          "categorie": {
+            "$oid": "6a2a940f72a6b2418c0fbd46"
+          },
+          "prerequis": [
+            {
+              "$oid": "6a2a940f72a6b2418c0fbd4c"
+            }
+          ],
+          "dateEcheance": {
+            "$date": "2024-04-15T00:00:00.000Z"
+          },
+          "dateCompletion": null,
+          "estimation": 40,
+          "tempsReel": 0,
+          "scoreUrgence": 90,
+          "pieceJointes": [],
+          "tags": [
+            "api",
+            "express",
+            "nodejs"
+          ],
+          "historique": [],
+          "createdBy": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd4e"
+          },
+          "titre": "Rédaction des fiches de poste",
+          "description": "Création des 15 fiches de poste pour le recrutement Q2",
+          "statut": "en_cours",
+          "priorite": "normale",
+          "projet": {
+            "$oid": "6a2a940f72a6b2418c0fbd4a"
+          },
+          "assigneA": {
+            "$oid": "6a2a940f72a6b2418c0fbd45"
+          },
+          "categorie": {
+            "$oid": "6a2a940f72a6b2418c0fbd47"
+          },
+          "prerequis": [],
+          "dateEcheance": {
+            "$date": "2024-03-15T00:00:00.000Z"
+          },
+          "dateCompletion": null,
+          "estimation": 8,
+          "tempsReel": 3,
+          "scoreUrgence": 55,
+          "pieceJointes": [],
+          "tags": [
+            "recrutement",
+            "rh"
+          ],
+          "historique": [
+            {
+              "ancienStatut": "a_faire",
+              "nouveauStatut": "en_cours",
+              "changedBy": {
+                "$oid": "6a2a940f72a6b2418c0fbd45"
+              },
+              "note": "Démarrage rédaction",
+              "changedAt": {
+                "$date": "2024-03-02T08:30:00.000Z"
+              }
+            }
+          ],
+          "createdBy": {
+            "$oid": "6a2a940f72a6b2418c0fbd42"
+          },
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "commentaires",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd4f"
+          },
+          "contenu": "La modélisation est presque terminée, il reste les index composés à définir.",
+          "tache": {
+            "$oid": "6a2a940f72a6b2418c0fbd4c"
+          },
+          "auteur": {
+            "$oid": "6a2a940f72a6b2418c0fbd44"
+          },
+          "parentId": null,
+          "modifie": false,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd50"
+          },
+          "contenu": "Parfait, assure-toi d'ajouter les index sur scoreUrgence pour les tâches.",
+          "tache": {
+            "$oid": "6a2a940f72a6b2418c0fbd4c"
+          },
+          "auteur": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "parentId": {
+            "$oid": "6a2a940f72a6b2418c0fbd4f"
+          },
+          "modifie": false,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          },
+          "updatedAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "notifications",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd51"
+          },
+          "destinataire": {
+            "$oid": "6a2a940f72a6b2418c0fbd43"
+          },
+          "type": "assignation",
+          "titre": "Nouvelle tâche assignée",
+          "message": "La tâche 'Analyse des besoins' vous a été assignée par Jean Dupont",
+          "lu": true,
+          "refId": {
+            "$oid": "6a2a940f72a6b2418c0fbd4b"
+          },
+          "refModel": "Tache",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd52"
+          },
+          "destinataire": {
+            "$oid": "6a2a940f72a6b2418c0fbd44"
+          },
+          "type": "assignation",
+          "titre": "Nouvelle tâche assignée",
+          "message": "La tâche 'Conception de la base de données' vous a été assignée",
+          "lu": false,
+          "refId": {
+            "$oid": "6a2a940f72a6b2418c0fbd4c"
+          },
+          "refModel": "Tache",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd53"
+          },
+          "destinataire": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "type": "statut",
+          "titre": "Tâche terminée",
+          "message": "Alice Bernard a marqué 'Analyse des besoins' comme terminée",
+          "lu": false,
+          "refId": {
+            "$oid": "6a2a940f72a6b2418c0fbd4b"
+          },
+          "refModel": "Tache",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "sessions_travail",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd54"
+          },
+          "tache": {
+            "$oid": "6a2a940f72a6b2418c0fbd4b"
+          },
+          "employe": {
+            "$oid": "6a2a940f72a6b2418c0fbd43"
+          },
+          "debut": {
+            "$date": "2024-01-16T08:00:00.000Z"
+          },
+          "fin": {
+            "$date": "2024-01-16T12:00:00.000Z"
+          },
+          "duree": 240,
+          "note": "Premières réunions avec les parties prenantes",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd55"
+          },
+          "tache": {
+            "$oid": "6a2a940f72a6b2418c0fbd4c"
+          },
+          "employe": {
+            "$oid": "6a2a940f72a6b2418c0fbd44"
+          },
+          "debut": {
+            "$date": "2024-02-01T09:00:00.000Z"
+          },
+          "fin": {
+            "$date": "2024-02-01T14:30:00.000Z"
+          },
+          "duree": 330,
+          "note": "Modélisation des collections users, projets et categories",
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    },
+    {
+      "collection": "journal_audit",
+      "documents": [
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd56"
+          },
+          "utilisateur": {
+            "$oid": "6a2a940f72a6b2418c0fbd40"
+          },
+          "action": "connexion",
+          "ressource": "User",
+          "ressourceId": {
+            "$oid": "6a2a940f72a6b2418c0fbd40"
+          },
+          "details": {
+            "message": "Connexion réussie"
+          },
+          "ip": "192.168.1.1",
+          "suspecte": false,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd57"
+          },
+          "utilisateur": {
+            "$oid": "6a2a940f72a6b2418c0fbd41"
+          },
+          "action": "creation",
+          "ressource": "Projet",
+          "ressourceId": {
+            "$oid": "6a2a940f72a6b2418c0fbd49"
+          },
+          "details": {
+            "titre": "Refonte du Système de Gestion Interne"
+          },
+          "ip": "192.168.1.2",
+          "suspecte": false,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        },
+        {
+          "_id": {
+            "$oid": "6a2a940f72a6b2418c0fbd58"
+          },
+          "utilisateur": {
+            "$oid": "6a2a940f72a6b2418c0fbd43"
+          },
+          "action": "changement_statut",
+          "ressource": "Tache",
+          "ressourceId": {
+            "$oid": "6a2a940f72a6b2418c0fbd4b"
+          },
+          "details": {
+            "avant": {
+              "statut": "en_cours"
+            },
+            "apres": {
+              "statut": "termine"
+            }
+          },
+          "ip": "192.168.1.3",
+          "suspecte": false,
+          "createdAt": {
+            "$date": "2026-06-11T10:55:11.693Z"
+          }
+        }
+      ]
+    }
+  ]
+}
