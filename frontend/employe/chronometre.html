@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chronomètre — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+  <style>
+    .timer-card {
+      text-align: center;
+      padding: 48px;
+    }
+    .timer-display {
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: 4px;
+      margin: 24px 0;
+      font-family: 'Courier New', monospace;
+    }
+    .timer-display.running { color: var(--primary); }
+    .timer-tache {
+      font-size: 16px;
+      color: var(--gray);
+      margin-bottom: 32px;
+    }
+    .timer-tache strong { color: var(--dark); }
+    .timer-buttons { display: flex; gap: 16px; justify-content: center; }
+    .btn-timer {
+      padding: 16px 40px;
+      font-size: 16px;
+      border-radius: 50px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">E</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Employé</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-taches.html"><span class="icon">✅</span> Mes Tâches</a></li>
+        <li class="nav-item"><a href="chronometre.html" class="active"><span class="icon">⏱️</span> Chronomètre</a></li>
+        <li class="nav-item"><a href="rapport-temps.html"><span class="icon">📈</span> Rapport Temps</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>⏱️ Chronomètre</h1>
+        <p>Suivre votre temps de travail</p>
+      </div>
+    </div>
+
+    <!-- Sélection de tâche -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Sélectionner une tâche</h3>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ma tâche en cours</label>
+        <select id="selectTache" class="form-control">
+          <option value="">-- Choisir une tâche --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="card timer-card">
+      <p class="timer-tache" id="timerTacheNom">
+        Aucune tâche sélectionnée
+      </p>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <div class="timer-buttons">
+        <button class="btn btn-primary btn-timer" id="btnDemarrer">▶ Démarrer</button>
+        <button class="btn btn-danger btn-timer" id="btnArreter" style="display:none">⏹ Arrêter</button>
+      </div>
+      <div class="alert alert-success mt-2" id="alertSuccess" style="max-width:400px;margin:16px auto 0"></div>
+      <div class="alert alert-error mt-2" id="alertError" style="max-width:400px;margin:8px auto 0"></div>
+    </div>
+
+    <!-- Historique sessions -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📋 Mes sessions récentes</h3>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Tâche</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Durée</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="tableSessions">
+            <tr><td colspan="5" class="text-center">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="chronometre.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

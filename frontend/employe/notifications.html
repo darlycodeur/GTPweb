@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">E</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Employé</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-taches.html"><span class="icon">✅</span> Mes Tâches</a></li>
+        <li class="nav-item"><a href="chronometre.html"><span class="icon">⏱️</span> Chronomètre</a></li>
+        <li class="nav-item"><a href="rapport-temps.html"><span class="icon">📈</span> Rapport Temps</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html" class="active"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>🔔 Notifications</h1>
+        <p id="compteurNonLues">Chargement...</p>
+      </div>
+      <button class="btn btn-outline" id="btnToutesLues">✓ Tout marquer comme lu</button>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; gap:16px;">
+        <button class="btn btn-primary btn-sm" id="filtreToutes">Toutes</button>
+        <button class="btn btn-outline btn-sm" id="filtreNonLues">Non lues</button>
+      </div>
+    </div>
+
+    <div id="listeNotifications">
+      <div class="card text-center"><div class="spinner"></div></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="notifications.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

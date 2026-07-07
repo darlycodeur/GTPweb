@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Tâches — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">E</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Employé</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-taches.html" class="active"><span class="icon">✅</span> Mes Tâches</a></li>
+        <li class="nav-item"><a href="chronometre.html"><span class="icon">⏱️</span> Chronomètre</a></li>
+        <li class="nav-item"><a href="rapport-temps.html"><span class="icon">📈</span> Rapport Temps</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>✅ Mes Tâches</h1>
+        <p>Toutes vos tâches assignées</p>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <select class="form-control" id="filtreStatut" style="width:180px">
+          <option value="">Tous les statuts</option>
+          <option value="a_faire">À faire</option>
+          <option value="en_cours">En cours</option>
+          <option value="en_revue">En revue</option>
+          <option value="termine">Terminé</option>
+          <option value="bloque">Bloqué</option>
+        </select>
+        <select class="form-control" id="filtrePriorite" style="width:180px">
+          <option value="">Toutes les priorités</option>
+          <option value="critique">Critique</option>
+          <option value="haute">Haute</option>
+          <option value="normale">Normale</option>
+          <option value="basse">Basse</option>
+        </select>
+        <button class="btn btn-outline" id="btnFiltrer">Filtrer</button>
+        <button class="btn btn-outline" id="btnUrgence">🔥 Par urgence</button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Projet</th>
+              <th>Priorité</th>
+              <th>Statut</th>
+              <th>Échéance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableTaches">
+            <tr><td colspan="6" class="text-center"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Changer Statut -->
+<div class="modal-overlay" id="modalStatut">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Changer le statut</h3>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <input type="hidden" id="tacheId">
+    <div class="form-group">
+      <label class="form-label">Nouveau statut</label>
+      <select id="nouveauStatut" class="form-control">
+        <option value="a_faire">À faire</option>
+        <option value="en_cours">En cours</option>
+        <option value="en_revue">En revue</option>
+        <option value="termine">Terminé</option>
+        <option value="bloque">Bloqué</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (optionnel)</label>
+      <textarea id="noteStatut" class="form-control" rows="3" placeholder="Explication du changement..."></textarea>
+    </div>
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px">
+      <button class="btn btn-outline" id="btnAnnuler">Annuler</button>
+      <button class="btn btn-primary" id="btnChangerStatut">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="mes-taches.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

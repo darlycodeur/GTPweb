@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utilisateurs — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>admin</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="utilisateurs.html" class="active"><span class="icon">👥</span> Utilisateurs</a></li>
+        <li class="nav-item"><a href="projets.html"><span class="icon">📁</span> Projets</a></li>
+        <li class="nav-item"><a href="categories.html"><span class="icon">🏷️</span> Catégories</a></li>
+        <li class="nav-item"><a href="statistiques.html"><span class="icon">📈</span> Statistiques</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+        <li class="nav-item"><a href="audit.html"><span class="icon">📋</span> Journal Audit</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>👥 Utilisateurs</h1>
+        <p>Gérer tous les comptes</p>
+      </div>
+      <button class="btn btn-primary" id="btnAjouter">+ Ajouter utilisateur</button>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <select class="form-control" id="filtreRole" style="width:200px">
+          <option value="">Tous les rôles</option>
+          <option value="admin">Admin</option>
+          <option value="chef_projet">Chef de Projet</option>
+          <option value="employe">Employé</option>
+        </select>
+        <select class="form-control" id="filtreActif" style="width:200px">
+          <option value="">Tous les statuts</option>
+          <option value="true">Actif</option>
+          <option value="false">Inactif</option>
+        </select>
+        <button class="btn btn-outline" id="btnFiltrer">Filtrer</button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Quota</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableUsers">
+            <tr><td colspan="6" class="text-center"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Ajouter/Modifier -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitre">Ajouter un utilisateur</h3>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="alert alert-error"   id="alertError"></div>
+    <div class="alert alert-success" id="alertSuccess"></div>
+
+    <input type="hidden" id="userId">
+
+    <div class="form-group">
+      <label class="form-label">Nom complet</label>
+      <input type="text" id="userNom" class="form-control" placeholder="Jean Dupont">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="userEmail" class="form-control" placeholder="jean@email.com">
+    </div>
+    <div class="form-group" id="groupMotDePasse">
+      <label class="form-label">Mot de passe</label>
+      <div class="password-wrapper">
+        <input type="password" id="userMotDePasse" class="form-control" placeholder="••••••••">
+        <button type="button" class="password-toggle" id="toggleUserMdp" aria-label="Afficher le mot de passe">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Avatar (optionnel)</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="avatarPreview" style="width:48px;height:48px;border-radius:50%;background:var(--gray-light);display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:20px;overflow:hidden;flex-shrink:0">📷</div>
+        <input type="file" id="userAvatar" accept="image/jpeg,image/png,image/gif,image/webp" style="flex:1;padding:8px 14px;border:2px solid var(--gray-light);border-radius:var(--radius);font-size:14px;background:var(--white)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Rôle</label>
+      <select id="userRole" class="form-control">
+        <option value="employe">Employé</option>
+        <option value="chef_projet">Chef de Projet</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Quota de tâches (optionnel)</label>
+      <input type="number" id="userQuota" class="form-control" placeholder="10" min="0" max="99">
+    </div>
+    <div class="form-group" id="groupActif" style="display:none">
+      <label class="form-label">Statut</label>
+      <select id="userActif" class="form-control">
+        <option value="true">Actif</option>
+        <option value="false">Inactif</option>
+      </select>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px">
+      <button class="btn btn-outline" id="btnAnnuler">Annuler</button>
+      <button class="btn btn-primary" id="btnSauvegarder">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="utilisateurs.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

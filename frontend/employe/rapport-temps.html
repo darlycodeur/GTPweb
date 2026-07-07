@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport Temps — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+  <style>
+    .rapport-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .rapport-filters {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+    .rapport-filters .form-group {
+      margin-bottom: 0;
+    }
+    .total-card {
+      text-align: center;
+      padding: 32px;
+    }
+    .total-card .total-valeur {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .total-card .total-label {
+      font-size: 14px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .total-sous {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .total-sous span {
+      font-size: 14px;
+      color: var(--dark);
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">E</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Employé</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-taches.html"><span class="icon">✅</span> Mes Tâches</a></li>
+        <li class="nav-item"><a href="chronometre.html"><span class="icon">⏱️</span> Chronomètre</a></li>
+        <li class="nav-item"><a href="rapport-temps.html" class="active"><span class="icon">📈</span> Rapport Temps</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>📈 Rapport Temps</h1>
+        <p>Visualiser votre temps de travail par tâche et par projet</p>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div class="card-header rapport-header">
+        <h3 class="card-title">Filtrer par période</h3>
+        <div class="rapport-filters">
+          <div class="form-group">
+            <label class="form-label">Du</label>
+            <input type="date" id="filtreDebut" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Au</label>
+            <input type="date" id="filtreFin" class="form-control">
+          </div>
+          <button class="btn btn-primary" id="btnAppliquer">Appliquer</button>
+          <button class="btn btn-outline" id="btnReset">Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total général -->
+    <div class="card total-card">
+      <div class="total-valeur" id="totalHeures">0h</div>
+      <div class="total-label">Temps total</div>
+      <div class="total-sous">
+        <span id="totalMinutes">0 min</span>
+        <span id="totalSessions">0 session(s)</span>
+      </div>
+    </div>
+
+    <!-- Par Tâche -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📋 Par Tâche</h3>
+        <p class="card-subtitle">Répartition du temps par tâche</p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Tâche</th>
+              <th>Projet</th>
+              <th>Temps (min)</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="tableParTache">
+            <tr><td colspan="4" class="text-center">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Par Projet -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📁 Par Projet</h3>
+        <p class="card-subtitle">Répartition du temps par projet</p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Projet</th>
+              <th>Temps (min)</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="tableParProjet">
+            <tr><td colspan="3" class="text-center">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Détail des sessions -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📄 Détail des sessions</h3>
+        <p class="card-subtitle">Toutes les sessions de la période</p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Tâche</th>
+              <th>Projet</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Durée</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="tableSessions">
+            <tr><td colspan="6" class="text-center">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="rapport-temps.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projets — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>admin</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="utilisateurs.html"><span class="icon">👥</span> Utilisateurs</a></li>
+        <li class="nav-item"><a href="projets.html" class="active"><span class="icon">📁</span> Projets</a></li>
+        <li class="nav-item"><a href="categories.html"><span class="icon">🏷️</span> Catégories</a></li>
+        <li class="nav-item"><a href="statistiques.html"><span class="icon">📈</span> Statistiques</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+        <li class="nav-item"><a href="audit.html"><span class="icon">📋</span> Journal Audit</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>📁 Projets</h1>
+        <p>Tous les projets de l'organisation</p>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <select class="form-control" id="filtreStatut" style="width:180px">
+          <option value="">Tous les statuts</option>
+          <option value="planifie">Planifié</option>
+          <option value="en_cours">En cours</option>
+          <option value="termine">Terminé</option>
+          <option value="suspendu">Suspendu</option>
+        </select>
+        <select class="form-control" id="filtrePriorite" style="width:180px">
+          <option value="">Toutes les priorités</option>
+          <option value="critique">Critique</option>
+          <option value="haute">Haute</option>
+          <option value="normale">Normale</option>
+          <option value="basse">Basse</option>
+        </select>
+        <button class="btn btn-outline" id="btnFiltrer">Filtrer</button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Chef de projet</th>
+              <th>Catégorie</th>
+              <th>Statut</th>
+              <th>Priorité</th>
+              <th>Membres</th>
+              <th>Échéance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableProjets">
+            <tr><td colspan="8" class="text-center"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="projets.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

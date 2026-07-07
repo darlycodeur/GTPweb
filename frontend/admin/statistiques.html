@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+  <style>
+    .stats-section { margin-bottom: 30px; }
+    .progress-bar {
+      height: 10px;
+      background: var(--gray-light);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+    .chart-bar-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 180px;
+      padding: 16px 0;
+    }
+    .chart-bar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .chart-bar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      min-height: 4px;
+      transition: height 0.5s ease;
+    }
+    .chart-bar-label { font-size: 12px; color: var(--gray); text-align: center; }
+    .chart-bar-value { font-size: 13px; font-weight: 700; color: var(--dark); }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>admin</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="utilisateurs.html"><span class="icon">👥</span> Utilisateurs</a></li>
+        <li class="nav-item"><a href="projets.html"><span class="icon">📁</span> Projets</a></li>
+        <li class="nav-item"><a href="categories.html"><span class="icon">🏷️</span> Catégories</a></li>
+        <li class="nav-item"><a href="statistiques.html" class="active"><span class="icon">📈</span> Statistiques</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+        <li class="nav-item"><a href="audit.html"><span class="icon">📋</span> Journal Audit</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>📈 Statistiques</h1>
+        <p>Vue globale des performances</p>
+      </div>
+    </div>
+
+    <!-- Stats globales -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF2FF">👥</div>
+        <div class="stat-info"><p>Total Utilisateurs</p><h3 id="statUsers">-</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ECFDF5">📁</div>
+        <div class="stat-info"><p>Total Projets</p><h3 id="statProjets">-</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FFF7ED">✅</div>
+        <div class="stat-info"><p>Total Tâches</p><h3 id="statTaches">-</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FEF2F2">🏆</div>
+        <div class="stat-info"><p>Taux de complétion</p><h3 id="statTaux">-%</h3></div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+
+      <!-- Tâches par statut -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">✅ Tâches par statut</h3>
+        </div>
+        <div id="statsTachesStatut"></div>
+      </div>
+
+      <!-- Projets par statut -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📁 Projets par statut</h3>
+        </div>
+        <div id="statsProjetsStatut"></div>
+      </div>
+
+    </div>
+
+    <!-- Tâches par priorité -->
+    <div class="card mt-2">
+      <div class="card-header">
+        <h3 class="card-title">🔥 Tâches par priorité</h3>
+      </div>
+      <div class="chart-bar-container" id="chartPriorite"></div>
+    </div>
+
+    <!-- Top employés -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🏆 Top employés (tâches terminées)</h3>
+      </div>
+      <div id="topEmployes"></div>
+    </div>
+
+    <!-- Répartition par rôle -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">👥 Utilisateurs par rôle</h3>
+      </div>
+      <div id="statsRoles"></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="statistiques.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

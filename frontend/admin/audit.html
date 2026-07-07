@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal Audit — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>admin</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="utilisateurs.html"><span class="icon">👥</span> Utilisateurs</a></li>
+        <li class="nav-item"><a href="projets.html"><span class="icon">📁</span> Projets</a></li>
+        <li class="nav-item"><a href="categories.html"><span class="icon">🏷️</span> Catégories</a></li>
+        <li class="nav-item"><a href="statistiques.html"><span class="icon">📈</span> Statistiques</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+        <li class="nav-item"><a href="audit.html" class="active"><span class="icon">📋</span> Journal Audit</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>📋 Journal d'Audit</h1>
+        <p>Toutes les activités du système</p>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <select class="form-control" id="filtreAction" style="width:200px">
+          <option value="">Toutes les actions</option>
+          <option value="connexion">Connexion</option>
+          <option value="creation">Création</option>
+          <option value="modification">Modification</option>
+          <option value="suppression">Suppression</option>
+          <option value="changement_statut">Changement statut</option>
+          <option value="archivage">Archivage</option>
+        </select>
+        <select class="form-control" id="filtreRessource" style="width:180px">
+          <option value="">Toutes les ressources</option>
+          <option value="User">Utilisateur</option>
+          <option value="Projet">Projet</option>
+          <option value="Tache">Tâche</option>
+          <option value="Categorie">Catégorie</option>
+        </select>
+        <select class="form-control" id="filtreSuspecte" style="width:180px">
+          <option value="">Toutes</option>
+          <option value="true">Suspectes uniquement</option>
+        </select>
+        <button class="btn btn-outline" id="btnFiltrer">Filtrer</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Action</th>
+              <th>Ressource</th>
+              <th>Détails</th>
+              <th>IP</th>
+              <th>Date</th>
+              <th>Suspect</th>
+            </tr>
+          </thead>
+          <tbody id="tableAudit">
+            <tr><td colspan="7" class="text-center"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="audit.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

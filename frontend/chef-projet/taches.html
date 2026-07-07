@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tâches — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">C</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Chef de Projet</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-projets.html"><span class="icon">📁</span> Mes Projets</a></li>
+        <li class="nav-item"><a href="taches.html" class="active"><span class="icon">✅</span> Tâches</a></li>
+        <li class="nav-item"><a href="membres.html"><span class="icon">👥</span> Membres</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>✅ Tâches</h1>
+        <p>Gérer et assigner les tâches</p>
+      </div>
+      <button class="btn btn-primary" id="btnNouvelleTache">+ Nouvelle Tâche</button>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card">
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <select class="form-control" id="filtreProjet" style="width:200px">
+          <option value="">Tous les projets</option>
+        </select>
+        <select class="form-control" id="filtreStatut" style="width:180px">
+          <option value="">Tous les statuts</option>
+          <option value="a_faire">À faire</option>
+          <option value="en_cours">En cours</option>
+          <option value="en_revue">En revue</option>
+          <option value="termine">Terminé</option>
+          <option value="bloque">Bloqué</option>
+        </select>
+        <button class="btn btn-outline" id="btnFiltrer">Filtrer</button>
+        <button class="btn btn-outline" id="btnUrgence">🔥 Par urgence</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Projet</th>
+              <th>Assigné à</th>
+              <th>Priorité</th>
+              <th>Statut</th>
+              <th>Échéance</th>
+              <th>Score</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableTaches">
+            <tr><td colspan="8" class="text-center"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Nouvelle Tâche -->
+<div class="modal-overlay" id="modalTache">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3 class="modal-title">Nouvelle Tâche</h3>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="alert alert-error" id="alertError"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Titre</label>
+        <input type="text" id="tacheTitre" class="form-control" placeholder="Titre de la tâche">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Description</label>
+        <textarea id="tacheDesc" class="form-control" rows="3" placeholder="Description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Projet</label>
+        <select id="tacheProjet" class="form-control"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assigné à</label>
+        <select id="tacheAssigne" class="form-control">
+          <option value="">Non assigné</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priorité</label>
+        <select id="tachePriorite" class="form-control">
+          <option value="basse">Basse</option>
+          <option value="normale" selected>Normale</option>
+          <option value="haute">Haute</option>
+          <option value="critique">Critique</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <select id="tacheCategorie" class="form-control">
+          <option value="">Aucune catégorie</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date échéance</label>
+        <input type="date" id="tacheEcheance" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estimation (heures)</label>
+        <input type="number" id="tacheEstimation" class="form-control" value="0" min="0">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Tags (séparés par virgule)</label>
+        <input type="text" id="tacheTags" class="form-control" placeholder="dev, frontend, urgent">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px">
+      <button class="btn btn-outline" id="btnAnnuler">Annuler</button>
+      <button class="btn btn-primary" id="btnSauvegarder">Créer la tâche</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="taches.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catégories — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>admin</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="utilisateurs.html"><span class="icon">👥</span> Utilisateurs</a></li>
+        <li class="nav-item"><a href="projets.html"><span class="icon">📁</span> Projets</a></li>
+        <li class="nav-item"><a href="categories.html" class="active"><span class="icon">🏷️</span> Catégories</a></li>
+        <li class="nav-item"><a href="statistiques.html"><span class="icon">📈</span> Statistiques</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+        <li class="nav-item"><a href="audit.html"><span class="icon">📋</span> Journal Audit</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>🏷️ Catégories</h1>
+        <p>Gérer les catégories de projets et tâches</p>
+      </div>
+      <button class="btn btn-primary" id="btnAjouter">+ Ajouter catégorie</button>
+    </div>
+
+    <!-- Grille de catégories -->
+    <div id="grilleCats" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">
+      <div class="card text-center"><div class="spinner"></div></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalCat">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitre">Nouvelle Catégorie</h3>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="alert alert-error" id="alertError"></div>
+    <input type="hidden" id="catId">
+
+    <div class="form-group">
+      <label class="form-label">Nom</label>
+      <input type="text" id="catNom" class="form-control" placeholder="Nom de la catégorie">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Couleur</label>
+      <input type="color" id="catCouleur" class="form-control" value="#3B82F6" style="height:44px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea id="catDesc" class="form-control" rows="3" placeholder="Description..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Portée</label>
+      <select id="catPortee" class="form-control">
+        <option value="les_deux">Projets et Tâches</option>
+        <option value="projet">Projets uniquement</option>
+        <option value="tache">Tâches uniquement</option>
+      </select>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px">
+      <button class="btn btn-outline" id="btnAnnuler">Annuler</button>
+      <button class="btn btn-primary" id="btnSauvegarder">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="categories.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Employé — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>G<span>T</span>P</h2>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">E</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Employé</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html" class="active"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-taches.html"><span class="icon">✅</span> Mes Tâches</a></li>
+        <li class="nav-item"><a href="chronometre.html"><span class="icon">⏱️</span> Chronomètre</a></li>
+        <li class="nav-item"><a href="rapport-temps.html"><span class="icon">📈</span> Rapport Temps</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1 id="welcomeMsg">Bonjour 👋</h1>
+        <p>Voici un résumé de vos tâches</p>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF2FF">📋</div>
+        <div class="stat-info"><p>Mes tâches</p><h3 id="totalTaches">-</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FFF7ED">🔄</div>
+        <div class="stat-info"><p>En cours</p><h3 id="enCours">-</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ECFDF5">🏆</div>
+        <div class="stat-info"><p>Terminées</p><h3 id="terminees">-</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FEF2F2">🚨</div>
+        <div class="stat-info"><p>En retard</p><h3 id="enRetard">-</h3></div>
+      </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">📊 Mes tâches par statut</h3></div>
+        <canvas id="chartTachesStatut" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">🎯 Répartition des priorités</h3></div>
+        <canvas id="chartPriorites" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Mes tâches en cours -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">✅ Mes tâches en cours</h3>
+        <a href="mes-taches.html" class="btn btn-outline btn-sm">Voir tout</a>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Projet</th>
+              <th>Priorité</th>
+              <th>Échéance</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableMesTaches">
+            <tr><td colspan="5" class="text-center">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Notifications récentes -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🔔 Notifications récentes</h3>
+        <a href="notifications.html" class="btn btn-outline btn-sm">Voir tout</a>
+      </div>
+      <div id="listeNotifications">
+        <div class="text-center">Chargement...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="dashboard.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

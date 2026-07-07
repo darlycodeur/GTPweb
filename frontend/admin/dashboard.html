@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>G<span>T</span>P</h2>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span id="sidebarRole">admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item">
+          <a href="dashboard.html" class="active">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="utilisateurs.html">
+            <span class="icon">👥</span> Utilisateurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="projets.html">
+            <span class="icon">📁</span> Projets
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="categories.html">
+            <span class="icon">🏷️</span> Catégories
+          </a>
+        </li>
+      </ul>
+
+      <p class="nav-section-title">Système</p>
+      <ul>
+        <li class="nav-item">
+          <a href="statistiques.html">
+            <span class="icon">📈</span> Statistiques
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="notifications.html">
+            <span class="icon">🔔</span> Notifications
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="audit.html">
+            <span class="icon">📋</span> Journal Audit
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">
+        🚪 Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Dashboard</h1>
+        <p>Vue globale du système</p>
+      </div>
+      <div>
+        <span id="dateActuelle"></span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF2FF">👥</div>
+        <div class="stat-info">
+          <p>Utilisateurs</p>
+          <h3 id="totalUsers">-</h3>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ECFDF5">📁</div>
+        <div class="stat-info">
+          <p>Projets actifs</p>
+          <h3 id="totalProjets">-</h3>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FFF7ED">✅</div>
+        <div class="stat-info">
+          <p>Tâches totales</p>
+          <h3 id="totalTaches">-</h3>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FEF2F2">🏷️</div>
+        <div class="stat-info">
+          <p>Catégories</p>
+          <h3 id="totalCategories">-</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">📊 Tâches par statut</h3></div>
+        <canvas id="chartTachesStatut" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">📁 Projets par statut</h3></div>
+        <canvas id="chartProjetsStatut" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">🔥 Tâches urgentes</h3></div>
+        <canvas id="chartUrgentes" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Tableaux côte à côte -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+      <!-- Derniers utilisateurs -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">👥 Derniers utilisateurs</h3>
+          <a href="utilisateurs.html" class="btn btn-outline btn-sm">Voir tout</a>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody id="tableUsers">
+              <tr><td colspan="3" class="text-center">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Derniers projets -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📁 Derniers projets</h3>
+          <a href="projets.html" class="btn btn-outline btn-sm">Voir tout</a>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Statut</th>
+                <th>Priorité</th>
+              </tr>
+            </thead>
+            <tbody id="tableProjets">
+              <tr><td colspan="3" class="text-center">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Graphique activité -->
+    <div class="card mt-2">
+      <div class="card-header">
+        <h3 class="card-title">📈 Activité des 7 derniers jours</h3>
+      </div>
+      <canvas id="chartActivite" height="120"></canvas>
+    </div>
+
+    <!-- Journal Audit récent -->
+    <div class="card mt-2">
+      <div class="card-header">
+        <h3 class="card-title">📋 Activité récente</h3>
+        <a href="audit.html" class="btn btn-outline btn-sm">Voir tout</a>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Action</th>
+              <th>Ressource</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="tableAudit">
+            <tr><td colspan="4" class="text-center">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="dashboard.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>

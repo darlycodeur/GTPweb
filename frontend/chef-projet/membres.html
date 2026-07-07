@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membres — GTP</title>
+  <link rel="stylesheet" href="../shared/css/global.css">
+  <link rel="stylesheet" href="../shared/css/sidebar.css">
+</head>
+<body>
+<div class="app-container">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo"><h2>G<span>T</span>P</h2></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">C</div>
+      <div class="sidebar-user-info">
+        <p id="sidebarNom">Chargement...</p>
+        <span>Chef de Projet</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Principal</p>
+      <ul>
+        <li class="nav-item"><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+        <li class="nav-item"><a href="mes-projets.html"><span class="icon">📁</span> Mes Projets</a></li>
+        <li class="nav-item"><a href="taches.html"><span class="icon">✅</span> Tâches</a></li>
+        <li class="nav-item"><a href="membres.html" class="active"><span class="icon">👥</span> Membres</a></li>
+        <li class="nav-item"><a href="commentaires.html"><span class="icon">💬</span> Commentaires</a></li>
+        <li class="nav-item"><a href="notifications.html"><span class="icon">🔔</span> Notifications</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">🚪 Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>👥 Membres</h1>
+        <p>Membres de vos projets</p>
+      </div>
+      <button class="btn btn-primary" id="btnAjouterMembre">+ Ajouter un membre</button>
+    </div>
+
+    <!-- Sélection projet -->
+    <div class="card">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Sélectionner un projet</label>
+        <select id="selectProjet" class="form-control">
+          <option value="">-- Choisir un projet --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Liste membres -->
+    <div id="listeMembres" style="display:none">
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px"
+        id="gridMembres"></div>
+    </div>
+
+    <div id="placeholder" class="card text-center" style="padding:48px; color:var(--gray)">
+      <p style="font-size:48px">👥</p>
+      <p style="margin-top:12px">Sélectionnez un projet pour voir ses membres</p>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal Ajouter un membre -->
+<div class="modal-overlay" id="modalMembre">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Ajouter un membre</h3>
+      <button class="modal-close" id="modalMembreClose">×</button>
+    </div>
+    <div class="alert alert-error" id="alertMembreError"></div>
+    <div class="alert alert-success" id="alertMembreSuccess"></div>
+
+    <div class="form-group">
+      <label class="form-label">Nom complet</label>
+      <input type="text" id="membreNom" class="form-control" placeholder="Jean Dupont">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="membreEmail" class="form-control" placeholder="jean@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <div class="password-wrapper">
+        <input type="password" id="membreMotDePasse" class="form-control" placeholder="••••••••">
+        <button type="button" class="password-toggle" id="toggleMembreMdp" aria-label="Afficher le mot de passe">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Avatar (optionnel)</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="avatarMembrePreview" style="width:48px;height:48px;border-radius:50%;background:var(--gray-light);display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:20px;overflow:hidden;flex-shrink:0">📷</div>
+        <input type="file" id="membreAvatar" accept="image/jpeg,image/png,image/gif,image/webp" style="flex:1;padding:8px 14px;border:2px solid var(--gray-light);border-radius:var(--radius);font-size:14px;background:var(--white)">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px">
+      <button class="btn btn-outline" id="btnMembreAnnuler">Annuler</button>
+      <button class="btn btn-primary" id="btnMembreSauvegarder">Créer le membre</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth-guard.js"></script>
+<script src="../shared/js/role-guard.js"></script>
+<script src="membres.js"></script>
+<script src="../shared/js/confirm-modal.js"></script>
+<script src="../shared/js/auto-avatar.js"></script>
+</body>
+</html>
