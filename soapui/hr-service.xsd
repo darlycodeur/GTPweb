@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  CONTRAT SOAP — legacy-hr-system (GROUPE 1 : Gestion de taches / Sync RH)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  Ce XSD est la SOURCE DE VERITE du service. Il doit refleter fidelement
+  les tables SQL du systeme legacy :
+
+    employee( id BIGINT PK AUTO, employee_code VARCHAR UNIQUE,
+              first_name VARCHAR, last_name VARCHAR,
+              department VARCHAR, status VARCHAR(ACTIVE|ON_LEAVE|BUSY) )
+
+    employee_skill( id BIGINT PK AUTO, employee_id BIGINT FK -> employee.id,
+                    skill_name VARCHAR, proficiency VARCHAR )
+
+  Points de vocabulaire importants :
+   - namespace cible  : http://upg.ac.rw/soap/hr
+   - elementFormDefault="qualified" : les elements doivent porter le prefixe
+     du namespace dans les documents XML, sinon le WSDL est invalide pour
+     les clients (le module `soap` de Node.js le refuse).
+   - Les listes utilisent maxOccurs="unbounded" (defi SOAP du groupe 1 :
+     une liste d'employes contenant une liste de competences = liste imbriquee).
+   - Les types sont STRICTS : xs:long pour les cles, xs:string pour le texte.
+     Aucun "string" generique la ou un type precis est connu.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:hr="http://upg.ac.rw/soap/hr"
+           targetNamespace="http://upg.ac.rw/soap/hr"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0">
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         0. CONVENTION DE NOMMAGE DES MESSAGES (regle critique !)
+         ═══════════════════════════════════════════════════════════════
+
+         DefaultWsdl11Definition ne lit PAS de <wsdl:portType> dans le XSD :
+         il deduit les <wsdl:message>, le <wsdl:portType> et le
+         <wsdl:binding> du document lui-meme, via la classe
+         SuffixBasedPortTypesProvider, qui reconnait les elements globaux
+         par leur SUFFIX :
+
+             <operation>Request   -> message d'ENTREE
+             <operation>Response  -> message de SORTIE
+             <operation>Fault     -> message d'erreur
+
+         Un element global qui ne porte aucun de ces suffixes est IGNORE.
+
+         Consequence directe : le nom des elements de message ci-dessous
+         n'est pas libre. Une requete nommee `getDepartmentEmployees`
+         (sans suffixe) produit un WSDL dont les operations n'ont qu'un
+         <wsdl:output> et AUCUN <wsdl:input>, et dont le <portType> est
+         vide. Symptome alors observe :
+
+             - une requete SOAP manuelle repond parfaitement ;
+             - soap.createClientAsync() aboutit sans erreur ;
+             - mais l'appel echoue cote client Node.js :
+
+                   TypeError: Cannot read properties of null (reading '$name')
+                       at Client._invoke (node_modules/soap/lib/client.js)
+
+               car `client.wsdl.operations['getDepartmentEmployees']`
+               n'existe pas -> `method.input` vaut null.
+
+         D'ou les noms suffixes ci-dessous. Le nom de l'OPERATION reste
+         `getDepartmentEmployees` (c'est lui que le client appelle) : seul
+         l'element de requete porte le suffixe "Request".               -->
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         1. TYPES SIMPLES (restrictions sur les colonnes ENUM du SQL)
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Colonne employee.status : ACTIVE | ON_LEAVE | BUSY -->
+    <xs:simpleType name="AvailabilityStatus">
+        <xs:annotation>
+            <xs:documentation>
+                Disponibilite de l'employe, exposee par le SOAP sous le nom
+                availabilityStatus. Correspond directement a la colonne
+                employee.status du systeme legacy.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="AVAILABLE"/>
+            <xs:enumeration value="ON_LEAVE"/>
+            <xs:enumeration value="BUSY"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Colonne employee_skill.proficiency : niveau de maitrise d'une competence -->
+    <xs:simpleType name="Proficiency">
+        <xs:annotation>
+            <xs:documentation>
+                Niveau de maitrise d'une competence, tel que enregistre dans la
+                table employee_skill (colonne proficiency).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BEGINNER"/>
+            <xs:enumeration value="INTERMEDIATE"/>
+            <xs:enumeration value="EXPERT"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         2. TYPES COMPLEXES
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Une competence (ligne de la table employee_skill) -->
+    <xs:complexType name="Skill">
+        <xs:annotation>
+            <xs:documentation>
+                Une competence possedee par un employe.
+                Table SQL : employee_skill.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="skillName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee_skill.skill_name (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="proficiency" type="hr:Proficiency">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee_skill.proficiency (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Liste de competences : maxOccurs="unbounded" = LISTE IMBRIQUEE -->
+    <xs:complexType name="SkillList">
+        <xs:annotation>
+            <xs:documentation>
+                Liste des competences d'un employe. minOccurs="0" autorise un
+                employe sans aucune competence (liste vide) ; maxOccurs="unbounded"
+                permet d'en renvoyer un nombre quelconque.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="skill" type="hr:Skill" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Un employe + ses competences (table employee + table employee_skill) -->
+    <xs:complexType name="Employee">
+        <xs:annotation>
+            <xs:documentation>
+                Un employe du systeme RH legacy, avec sa liste imbriquee de
+                competences. Table SQL : employee (jointure employee_skill).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="id" type="xs:long">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.id (BIGINT, cle primaire auto).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="employeeCode" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.employee_code (VARCHAR, unique). Ex : EMP-001.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="firstName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.first_name (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="lastName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.last_name (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="fullName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Concatenation first_name + last_name, exigee par le cahier
+                        des charges (champ "name" de la sortie XML). Champ derive,
+                        non stocke en base.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="department" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.department (VARCHAR). Ex : IT, MARKETING.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="availabilityStatus" type="hr:AvailabilityStatus">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.status, exposee sous le nom availabilityStatus.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="skills" type="hr:SkillList">
+                <xs:annotation>
+                    <xs:documentation>Liste imbriquee des competences (table employee_skill).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Liste d'employes : 2e niveau de listes imbriquees -->
+    <xs:complexType name="EmployeeList">
+        <xs:annotation>
+            <xs:documentation>
+                Liste d'employes d'un departement. minOccurs="0" : un departement
+                inconnu ou sans employe donne une liste vide plutot qu'une erreur.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="employee" type="hr:Employee" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         3. MESSAGES (operations exposees par le WSDL)
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- ── Operation : getDepartmentEmployees ──
+         ATTENTION : les types des elements de message sont volontairement
+         declarés INLINE (et non via un xs:complexType nomme). C'est la
+         convention imposee par Spring-WS / JAX-WS : XJC ne genere
+         l'annotation @XmlRootElement que pour un element global dont le type
+         est anonyme. Or @XmlRootElement est indispensable au routage
+         @PayloadRoot ET a la serialisation de la reponse. Avec un type
+         nomme, le serveur repond "No adapter for endpoint". -->
+
+    <!-- REQUETE : <getDepartmentEmployeesRequest><department>IT</department></getDepartmentEmployeesRequest> -->
+    <xs:element name="getDepartmentEmployeesRequest">
+        <xs:annotation>
+            <xs:documentation>
+                Requete de l'operation getDepartmentEmployees.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="department" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>Code du departement. Ex : IT, MARKETING, FINANCE.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- REPONSE : <getDepartmentEmployeesResponse><employees>...liste...</employees></getDepartmentEmployeesResponse> -->
+    <xs:element name="getDepartmentEmployeesResponse">
+        <xs:annotation>
+            <xs:documentation>
+                Reponse de l'operation getDepartmentEmployees : la liste
+                imbriquee employes -> competences, plus l'effectif total.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="employees" type="hr:EmployeeList"/>
+                <xs:element name="totalCount" type="xs:int">
+                    <xs:annotation>
+                        <xs:documentation>Nombre d'employes renvoyes (pratique pour le client Node.js).</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ── Operation : getAllDepartments (operation d'appui / bonus) ── -->
+
+    <xs:element name="getAllDepartmentsRequest">
+        <xs:annotation>
+            <xs:documentation>Requete vide : liste tous les departements du systeme.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAllDepartmentsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="departments" type="hr:DepartmentList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="DepartmentList">
+        <xs:annotation>
+            <xs:documentation>Liste des departements connus du systeme RH legacy.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="department" type="hr:DepartmentInfo" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DepartmentInfo">
+        <xs:annotation>
+            <xs:documentation>Un departement et son effectif.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="code" type="xs:string"/>
+            <xs:element name="employeeCount" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="grp1-hr-legacy" activeEnvironment="Default" name="legacy-hr-system" resourceRoot="" soapui-version="5.10.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config">
+  <con:description>Projet d'examen API SOAP - GROUPE 1 : collection de tests SOAP.
+
+Systeme legacy interroge : legacy-hr-system (Spring Boot 3.4 + Spring-WS + H2)
+Contrat (WSDL)      : http://localhost:8080/ws/hr-service.wsdl
+Endpoint SOAP       : http://localhost:8080/ws
+Namespace           : http://upg.ac.rw/soap/hr
+
+INTERFACE HrServicePortType (les 2 operations declarees par le WSDL), avec
+4 requetes pre-remplies a l'onglet Request :
+
+  getDepartmentEmployees
+      - IT           -> 200  4 employes, 13 competences imbriquees
+      - MARKETING    -> 200  3 employes
+      - INCONNU      -> 500  soap:Fault, code metier DEPARTMENT_NOT_FOUND
+  getAllDepartments
+      - (sans objet) -> 200  IT / MARKETING / FINANCE avec les effectifs
+
+PRE-REQUIS : le legacy doit tourner sur le port 8080
+    cd /d D:\Projet\ApiSOAPProject\legacy-hr-system
+    java -jar target\legacy-hr-system-1.0.0.jar
+
+JOUER UNE REQUETE : double-cliquer sur l'operation, choisir la requete dans la
+liste (Request 1 / 2 / 3), puis bouton vert (Submit) : la reponse XML s'affiche
+dans l'onglet Response.</con:description>
+  <con:settings/>
+  <con:interface xsi:type="con:WsdlInterface" id="if1" wsaVersion="NONE" name="HrServicePortType" type="wsdl" bindingName="{http://upg.ac.rw/soap/hr}HrServicePortTypeSoap11" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/ws/hr-service.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:description>Service SOAP expose par le systeme RH legacy (Spring-WS).</con:description>
+    <con:definitionCache type="TEXT" rootPart="http://localhost:8080/ws/hr-service.wsdl">
+      <con:part>
+        <con:url>http://localhost:8080/ws/hr-service.wsdl</con:url>
+        <con:content><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://upg.ac.rw/soap/hr" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://upg.ac.rw/soap/hr" targetNamespace="http://upg.ac.rw/soap/hr">
+  <wsdl:types>
+    <xs:schema xmlns:hr="http://upg.ac.rw/soap/hr" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://upg.ac.rw/soap/hr" version="1.0">
+
+    <!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+         0. CONVENTION DE NOMMAGE DES MESSAGES (regle critique !)
+         âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+         DefaultWsdl11Definition ne lit PAS de <wsdl:portType> dans le XSD :
+         il deduit les <wsdl:message>, le <wsdl:portType> et le
+         <wsdl:binding> du document lui-meme, via la classe
+         SuffixBasedPortTypesProvider, qui reconnait les elements globaux
+         par leur SUFFIX :
+
+             <operation>Request   -> message d'ENTREE
+             <operation>Response  -> message de SORTIE
+             <operation>Fault     -> message d'erreur
+
+         Un element global qui ne porte aucun de ces suffixes est IGNORE.
+
+         Consequence directe : le nom des elements de message ci-dessous
+         n'est pas libre. Une requete nommee `getDepartmentEmployees`
+         (sans suffixe) produit un WSDL dont les operations n'ont qu'un
+         <wsdl:output> et AUCUN <wsdl:input>, et dont le <portType> est
+         vide. Symptome alors observe :
+
+             - une requete SOAP manuelle repond parfaitement ;
+             - soap.createClientAsync() aboutit sans erreur ;
+             - mais l'appel echoue cote client Node.js :
+
+                   TypeError: Cannot read properties of null (reading '$name')
+                       at Client._invoke (node_modules/soap/lib/client.js)
+
+               car `client.wsdl.operations['getDepartmentEmployees']`
+               n'existe pas -> `method.input` vaut null.
+
+         D'ou les noms suffixes ci-dessous. Le nom de l'OPERATION reste
+         `getDepartmentEmployees` (c'est lui que le client appelle) : seul
+         l'element de requete porte le suffixe "Request".               -->
+
+    <!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+         1. TYPES SIMPLES (restrictions sur les colonnes ENUM du SQL)
+         âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+
+    <!-- Colonne employee.status : ACTIVE | ON_LEAVE | BUSY -->
+    <xs:simpleType name="AvailabilityStatus">
+        <xs:annotation>
+            <xs:documentation>
+                Disponibilite de l'employe, exposee par le SOAP sous le nom
+                availabilityStatus. Correspond directement a la colonne
+                employee.status du systeme legacy.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="AVAILABLE"/>
+            <xs:enumeration value="ON_LEAVE"/>
+            <xs:enumeration value="BUSY"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Colonne employee_skill.proficiency : niveau de maitrise d'une competence -->
+    <xs:simpleType name="Proficiency">
+        <xs:annotation>
+            <xs:documentation>
+                Niveau de maitrise d'une competence, tel que enregistre dans la
+                table employee_skill (colonne proficiency).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BEGINNER"/>
+            <xs:enumeration value="INTERMEDIATE"/>
+            <xs:enumeration value="EXPERT"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+         2. TYPES COMPLEXES
+         âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+
+    <!-- Une competence (ligne de la table employee_skill) -->
+    <xs:complexType name="Skill">
+        <xs:annotation>
+            <xs:documentation>
+                Une competence possedee par un employe.
+                Table SQL : employee_skill.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="skillName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee_skill.skill_name (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="proficiency" type="hr:Proficiency">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee_skill.proficiency (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Liste de competences : maxOccurs="unbounded" = LISTE IMBRIQUEE -->
+    <xs:complexType name="SkillList">
+        <xs:annotation>
+            <xs:documentation>
+                Liste des competences d'un employe. minOccurs="0" autorise un
+                employe sans aucune competence (liste vide) ; maxOccurs="unbounded"
+                permet d'en renvoyer un nombre quelconque.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="skill" type="hr:Skill"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Un employe + ses competences (table employee + table employee_skill) -->
+    <xs:complexType name="Employee">
+        <xs:annotation>
+            <xs:documentation>
+                Un employe du systeme RH legacy, avec sa liste imbriquee de
+                competences. Table SQL : employee (jointure employee_skill).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="id" type="xs:long">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.id (BIGINT, cle primaire auto).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="employeeCode" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.employee_code (VARCHAR, unique). Ex : EMP-001.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="firstName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.first_name (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="lastName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.last_name (VARCHAR).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="fullName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Concatenation first_name + last_name, exigee par le cahier
+                        des charges (champ "name" de la sortie XML). Champ derive,
+                        non stocke en base.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="department" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.department (VARCHAR). Ex : IT, MARKETING.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="availabilityStatus" type="hr:AvailabilityStatus">
+                <xs:annotation>
+                    <xs:documentation>Colonne employee.status, exposee sous le nom availabilityStatus.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="skills" type="hr:SkillList">
+                <xs:annotation>
+                    <xs:documentation>Liste imbriquee des competences (table employee_skill).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Liste d'employes : 2e niveau de listes imbriquees -->
+    <xs:complexType name="EmployeeList">
+        <xs:annotation>
+            <xs:documentation>
+                Liste d'employes d'un departement. minOccurs="0" : un departement
+                inconnu ou sans employe donne une liste vide plutot qu'une erreur.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="employee" type="hr:Employee"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+         3. MESSAGES (operations exposees par le WSDL)
+         âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ -->
+
+    <!-- ââ Operation : getDepartmentEmployees ââ
+         ATTENTION : les types des elements de message sont volontairement
+         declarÃ©s INLINE (et non via un xs:complexType nomme). C'est la
+         convention imposee par Spring-WS / JAX-WS : XJC ne genere
+         l'annotation @XmlRootElement que pour un element global dont le type
+         est anonyme. Or @XmlRootElement est indispensable au routage
+         @PayloadRoot ET a la serialisation de la reponse. Avec un type
+         nomme, le serveur repond "No adapter for endpoint". -->
+
+    <!-- REQUETE : <getDepartmentEmployeesRequest><department>IT</department></getDepartmentEmployeesRequest> -->
+    <xs:element name="getDepartmentEmployeesRequest">
+        <xs:annotation>
+            <xs:documentation>
+                Requete de l'operation getDepartmentEmployees.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="department" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>Code du departement. Ex : IT, MARKETING, FINANCE.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- REPONSE : <getDepartmentEmployeesResponse><employees>...liste...</employees></getDepartmentEmployeesResponse> -->
+    <xs:element name="getDepartmentEmployeesResponse">
+        <xs:annotation>
+            <xs:documentation>
+                Reponse de l'operation getDepartmentEmployees : la liste
+                imbriquee employes -&gt; competences, plus l'effectif total.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="employees" type="hr:EmployeeList"/>
+                <xs:element name="totalCount" type="xs:int">
+                    <xs:annotation>
+                        <xs:documentation>Nombre d'employes renvoyes (pratique pour le client Node.js).</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ââ Operation : getAllDepartments (operation d'appui / bonus) ââ -->
+
+    <xs:element name="getAllDepartmentsRequest">
+        <xs:annotation>
+            <xs:documentation>Requete vide : liste tous les departements du systeme.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAllDepartmentsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="departments" type="hr:DepartmentList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="DepartmentList">
+        <xs:annotation>
+            <xs:documentation>Liste des departements connus du systeme RH legacy.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="department" type="hr:DepartmentInfo"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DepartmentInfo">
+        <xs:annotation>
+            <xs:documentation>Un departement et son effectif.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="code" type="xs:string"/>
+            <xs:element name="employeeCount" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getDepartmentEmployeesRequest">
+    <wsdl:part element="tns:getDepartmentEmployeesRequest" name="getDepartmentEmployeesRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getDepartmentEmployeesResponse">
+    <wsdl:part element="tns:getDepartmentEmployeesResponse" name="getDepartmentEmployeesResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllDepartmentsRequest">
+    <wsdl:part element="tns:getAllDepartmentsRequest" name="getAllDepartmentsRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllDepartmentsResponse">
+    <wsdl:part element="tns:getAllDepartmentsResponse" name="getAllDepartmentsResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HrServicePortType">
+    <wsdl:operation name="getDepartmentEmployees">
+      <wsdl:input message="tns:getDepartmentEmployeesRequest" name="getDepartmentEmployeesRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:getDepartmentEmployeesResponse" name="getDepartmentEmployeesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAllDepartments">
+      <wsdl:input message="tns:getAllDepartmentsRequest" name="getAllDepartmentsRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:getAllDepartmentsResponse" name="getAllDepartmentsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HrServicePortTypeSoap11" type="tns:HrServicePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getDepartmentEmployees">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="getDepartmentEmployeesRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getDepartmentEmployeesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAllDepartments">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="getAllDepartmentsRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAllDepartmentsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HrService">
+    <wsdl:port binding="tns:HrServicePortTypeSoap11" name="HrServicePortTypeSoap11">
+      <soap:address location="http://localhost:8080/ws"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content>
+        <con:type>http://schemas.xmlsoap.org/wsdl/</con:type>
+      </con:part>
+    </con:definitionCache>
+    <con:endpoints>
+      <con:endpoint>http://localhost:8080/ws</con:endpoint>
+    </con:endpoints>
+      <con:operation id="op19919" isOneWay="false" action="" name="getDepartmentEmployees" bindingOperationName="getDepartmentEmployees" type="Request-Response" outputName="getDepartmentEmployeesResponse" inputName="getDepartmentEmployeesRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+        <con:description>Consulte un departement et retourne ses employes, chacun avec sa liste IMBRIQUEE de competences (maxOccurs="unbounded" dans le XSD). L'exception metier du legacy est automatiquement enveloppe dans une soap:Fault.</con:description>
+        <con:settings/>
+        <con:call id="call40669" name="IT - 4 employes">
+          <con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:encoding>UTF-8</con:encoding>
+          <con:endpoint>http://localhost:8080/ws</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hr="http://upg.ac.rw/soap/hr"><soapenv:Header/><soapenv:Body><hr:getDepartmentEmployeesRequest><hr:department>IT</hr:department></hr:getDepartmentEmployeesRequest></soapenv:Body></soapenv:Envelope>]]></con:request>
+          <con:credentials>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:jmsPropertyConfig/>
+          <con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/>
+        </con:call>
+        <con:call id="call480d2" name="MARKETING - 3 employes">
+          <con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:encoding>UTF-8</con:encoding>
+          <con:endpoint>http://localhost:8080/ws</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hr="http://upg.ac.rw/soap/hr"><soapenv:Header/><soapenv:Body><hr:getDepartmentEmployeesRequest><hr:department>MARKETING</hr:department></hr:getDepartmentEmployeesRequest></soapenv:Body></soapenv:Envelope>]]></con:request>
+          <con:credentials>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:jmsPropertyConfig/>
+          <con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/>
+        </con:call>
+        <con:call id="call4fb3b" name="INCONNU - soap:Fault">
+          <con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:encoding>UTF-8</con:encoding>
+          <con:endpoint>http://localhost:8080/ws</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hr="http://upg.ac.rw/soap/hr"><soapenv:Header/><soapenv:Body><hr:getDepartmentEmployeesRequest><hr:department>INCONNU</hr:department></hr:getDepartmentEmployeesRequest></soapenv:Body></soapenv:Envelope>]]></con:request>
+          <con:credentials>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:jmsPropertyConfig/>
+          <con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/>
+        </con:call>
+      </con:operation>
+      <con:operation id="op33232" isOneWay="false" action="" name="getAllDepartments" bindingOperationName="getAllDepartments" type="Request-Response" outputName="getAllDepartmentsResponse" inputName="getAllDepartmentsRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+        <con:description>Retourne les departements et leur effectif. C'est cette operation que le client Node.js appelle pour decouvrir quoi synchroniser dans MongoDB.</con:description>
+        <con:settings/>
+        <con:call id="call36fb0" name="Tous les departements">
+          <con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:encoding>UTF-8</con:encoding>
+          <con:endpoint>http://localhost:8080/ws</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hr="http://upg.ac.rw/soap/hr"><soapenv:Header/><soapenv:Body><hr:getAllDepartmentsRequest/></soapenv:Body></soapenv:Envelope>]]></con:request>
+          <con:credentials>
+            <con:authType>No Authorization</con:authType>
+          </con:credentials>
+          <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:jmsPropertyConfig/>
+          <con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/>
+        </con:call>
+      </con:operation>
+  </con:interface>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+  <con:oAuth1ProfileContainer/>
+<con:sensitiveInformation/></con:soapui-project>
