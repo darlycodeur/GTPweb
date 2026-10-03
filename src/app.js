@@ -30,6 +30,7 @@ app.use('/api/upload',        require('./routes/uploadRoutes'));
 app.use('/api/dashboard',     require('./routes/dashboardRoutes'));
 app.use('/api/recherche',     require('./routes/rechercheRoutes'));
 app.use('/api/statistiques',  require('./routes/statistiqueRoutes'));
+app.use('/api/employees',     require('./routes/employeeRoutes'));
 
 // ─── ROUTE SANTÉ ──────────────────────────
 app.get('/api/health', (req, res) => {
